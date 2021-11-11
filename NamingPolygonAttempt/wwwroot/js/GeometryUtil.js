@@ -2,6 +2,9 @@
 // for details on configuring this project to bundle and minify static web assets.
 
 // Write your JavaScript code.
+
+//Add code from this page comes from the Leaflet.draw github repository at https://github.com/Leaflet/Leaflet.draw/blob/develop/src/ext/GeometryUtil.js 
+
 (function () {
 
 	var defaultPrecision = {
