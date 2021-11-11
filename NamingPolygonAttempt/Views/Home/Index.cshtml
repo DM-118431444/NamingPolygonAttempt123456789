@@ -8,6 +8,13 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw-src.css" integrity="sha512-vJfMKRRm4c4UupyPwGUZI8U651mSzbmmPgR3sdE3LcwBPsdGeARvUM5EcSTg34DK8YIRiIo+oJwNfZPMKEQyug==" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" integrity="sha512-ozq8xQKq6urvuU6jNgkfqAmT7jKN2XumbrX1JiB3TnF7tI48DPI4Gy1GXKD/V3EExgAs1V+pRO7vwtS1LHg0Gw==" crossorigin="anonymous"></script>
+    
+    
+    <link href="https://cdn-webgl.wrld3d.com/wrldjs/addons/polygon_editor/latest/polygon_editor.css" rel="stylesheet" />
+    <script src="https://cdn-webgl.wrld3d.com/wrldjs/addons/polygon_editor/latest/polygon_editor.js"></script>
+
+    <script>src="..\js\GeometryUtil.js"</script>
+
 </head>
 <div class="text-center">
     <h1 class="display-4">Polygon naming example</h1>
@@ -21,6 +28,7 @@
         center: [51.8935, -8.4921],
         zoom: 16,
     });
+
     //OpenStreetMap Layer at https://leafletjs.com/index.html
     var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -37,6 +45,7 @@
     Esri_WorldImagery.addTo(map);
 
 
+   
 
     drawnItems = L.featureGroup().addTo(map);
     var drawControl = new L.Control.Draw({
@@ -54,14 +63,29 @@
     map.on(L.Draw.Event.CREATED, function (e) {
         var layer = e.layer;
         var name = getName(layer);
+        var seeArea = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]);
+
         if (name == 'geometry name') {
             layer.bindPopup('-- no name provided --');
         } else if (name == '') {
             layer.bindPopup('-- no name provided --');
         } else {
-            layer.bindTooltip(name, { permanent: true, direction: 'top' })
+            
+            console.log(seeArea);
+            layer.bindTooltip("Name of polygon: " + name + ", Area of polygon = " + ((seeArea / 10000).toFixed(2)) + " ha", { permanent: true, direction: 'top' })
         };
+
+
+
+
         drawnItems.addLayer(layer);
+        
+
+       
+
+
     });
+
+    
 
 </script>
