@@ -1,97 +1,277 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-
+@model NamingPolygonAttempt.ViewModels.TodoListViewModel
 <!-- All code that is not my own or auto-code, unless stated otherwise, is taken from  https://stackoverflow.com/questions/67153941/is-there-a-way-to-open-a-popup-input-text-after-a-polygon-is-created-in-leaflet by giskan77-->
 
 <head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+
+    <!-- Before adding database -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw-src.css" integrity="sha512-vJfMKRRm4c4UupyPwGUZI8U651mSzbmmPgR3sdE3LcwBPsdGeARvUM5EcSTg34DK8YIRiIo+oJwNfZPMKEQyug==" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" integrity="sha512-ozq8xQKq6urvuU6jNgkfqAmT7jKN2XumbrX1JiB3TnF7tI48DPI4Gy1GXKD/V3EExgAs1V+pRO7vwtS1LHg0Gw==" crossorigin="anonymous"></script>
 
-
+ 
 
 
     <script>src = "..\js\GeometryUtil.js"</script>
 
+    <script type="text/javascript">
+        var map;
+
+
+        function init() {
+            //Creating the map, centering it and adding the zoom
+             map = L.map('map', {
+                center: [51.8935, -8.4921],
+                zoom: 16,
+            });
+
+            //OpenStreetMap Layer at https://leafletjs.com/index.html
+            var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            osm.addTo(map);
+
+            //Esri.World Imagery js found at https://leaflet-extras.github.io/leaflet-providers/preview/ || They are open source tilelayers
+
+            var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+            });
+
+            Esri_WorldImagery.addTo(map);
+
+
+            var state = {
+            "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "properties": {},
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        46.7578125,
+                                        59.355596110016315
+                                    ],
+                                    [
+                                        45,
+                                        53.330872983017066
+                                    ],
+                                    [
+                                        60.1171875,
+                                        52.482780222078226
+                                    ],
+                                    [
+                                        62.9296875,
+                                        60.23981116999893
+                                    ],
+                                    [
+                                        46.7578125,
+                                        59.355596110016315
+                                    ]
+                                ]
+                            ]
+                        }
+                    }
+                ]
+        } 
+
+
+
+            drawnItems = L.featureGroup().addTo(map);
+
+
+
+
+
+
+
+            var drawControl = new L.Control.Draw({
+
+
+                edit: {
+                    featureGroup: drawnItems,
+                },
+            });
+            //Getting the user generated name of the ploygon from the popup
+            var getName = function (layer) {
+                var name = prompt('please, enter the geometry name', 'geometry name');
+                return name;
+            };
+
+            // Code to add the hectare acre calculations taken and modified from || How to get the area string from a polygon using leaflet.draw at https://stackoverflow.com/questions/29724725/how-to-get-the-area-string-from-a-polygon-using-leaflet-draw by The Brofessor
+            map.addControl(drawControl);
+            map.on(L.Draw.Event.CREATED, function (e) {
+                var layer = e.layer;
+                var name = getName(layer);
+                var points = layer._latlngs;
+                var geojson = layer.toGeoJSON();
+
+                // seeArea varible holds the value of the area generated by the user's polygon || the L.Geometry util method does the calculation and it is linked to the GeometryUtil.js file in the js folder of the project.
+                var seeArea = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]);
+                //If statement that does not name the polygon unless the user inputs some data
+                if (name == 'geometry name') {
+                    layer.bindPopup('-- no name provided --');
+                } else if (name == '') {
+                    layer.bindPopup('-- no name provided --');
+                } else {
+                    //Adds hectare acre to console log
+
+                    console.log(layer);
+                    console.log(seeArea);
+                    console.log(points);
+                    console.log(geojson);
+
+                    layer.bindTooltip("Name of polygon: " + name + ", Area of polygon = " + ((seeArea / 10000).toFixed(2)) + " ha", { permanent: true, direction: 'top' })
+                };
+
+
+
+                //Displays the name and hectare acreage to the polygon
+                drawnItems.addLayer(layer);
+            });
+
+            @foreach (var item in Model.TodoItems)
+            {
+
+                <text>
+
+            var btn = document.createElement("button");
+            btn.innerHTML = "Click me";
+
+                var id = (@item.Id);
+            var farmerid = @item.FarmerID;
+            var geojson2 = '@item.GeoJson';
+
+            //var geojson3 = JSON.stringify(geojson2);
+
+            var obj = JSON.parse(document.getElementById('mytextarea').innerHTML = geojson2);
+            console.log(obj['type']);
+
+
+            @*// var geojson1 = JSON.parse(''@item.GeoJson'');*@
+
+
+
+          //L.geoJSON(geojson3).addTo(map);
+                 /* Where I found out how to put button in popup, tutorial was for a hyperlink  http://jsfiddle.net/8Lnt4/ and
+                * https://stackoverflow.com/questions/13698975/click-link-inside-leaflet-popup-and-do-javascript */
+            //L.geoJSON(geojson1).bindPopup(geojson1).addTo(map);
+            //console.log(geojson1);
+            //console.log("Hello");
+
+
+
+                </text>
+
+                }
+
+            };
+
+
+
+
+
+    </script>
+
 </head>
-<div class="text-center">
-    <h1 class="display-4">Polygon naming example</h1>
-    
-</div>
 
-<div id="map" style="width: 100%; height: 500px;"></div>
 
+<body onLoad="javascript:init();">
+    <div class="text-center">
+        <h1 class="display-4">Polygon naming example</h1>
+
+    </div>
+
+    <div id="map" style="width: 100%; height: 500px;"></div>
+
+    <p id="demo"></p>
+
+    <input type="button" value="Get Current Location!" onClick="javascript:getLocationLeaflet();">
+
+    <input onclick="change()" type="button" value="Open Curtain" id="myButton1">
+
+    <textarea id="mytextarea">Text to be changed</textarea>
+
+    <table class="table table-striped table-bordered table-hover" style="max-width: 500px;">
+
+        <tr>
+            <td colspan="7">
+                @using (var form = Html.BeginForm("CreateUpdate", "Home", FormMethod.Post))
+                {
+                    @Html.HiddenFor(model => model.EditableItem.Id)
+                    <div class="input-group" style="width=300px;">
+                        @Html.TextBoxFor(model => model.EditableItem.FarmerID, new { @class = "form-control" })
+                        @Html.TextBoxFor(model => model.EditableItem.GeoJson, new { @class = "form-control" })
+
+
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-success" onclick="clearTextbox()">@(Model.EditableItem.Id > 0 ? "Update" : "Add")</button>
+                        </div>
+
+                    </div>
+                    @Html.ValidationSummary()
+
+                }
+            </td>
+        </tr>
+
+        @foreach (var item in Model.TodoItems)
+        {
+            <tr>
+
+                <td>
+
+                    <input type="checkbox" checked="@item.IsDone" onclick="window.location.href = '/Home/ToggleIsDone/@item.Id';" />
+
+                    <a href="/Home/Edit/@item.Id">
+                        @item.Id
+
+                    </a>
+
+                </td>
+
+
+
+                <td class="text-center"><a href="/Home/Delete/@item.Id" onclick="return confirm('Are you sure?');" class="btn btn-sm btn-danger">Delete</a></td>
+
+                <td>@item.FarmerID</td>
+                <td>@item.GeoJson</td>
+
+
+
+            </tr>
+
+
+
+        }
+
+    </table>
+
+
+
+
+</body>
 <script>
-    //Creating the map, centering it and adding the zoom 
-    var map = L.map('map', {
-        center: [51.8935, -8.4921],
-        zoom: 16,
-    });
-
-    //OpenStreetMap Layer at https://leafletjs.com/index.html
-    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    osm.addTo(map);
-
-    //Esri.World Imagery js found at https://leaflet-extras.github.io/leaflet-providers/preview/ || They are open source tilelayers
-
-    var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-    });
-
-    Esri_WorldImagery.addTo(map);
-
-
-
-
-    drawnItems = L.featureGroup().addTo(map);
-    var drawControl = new L.Control.Draw({
-
-
-        edit: {
-            featureGroup: drawnItems,
-        },
-    });
-    //Getting the user generated name of the ploygon from the popup
-    var getName = function (layer) {
-        var name = prompt('please, enter the geometry name', 'geometry name');
-        return name;
-    };
-
-    // Code to add the hectare acre calculations taken and modified from || How to get the area string from a polygon using leaflet.draw at https://stackoverflow.com/questions/29724725/how-to-get-the-area-string-from-a-polygon-using-leaflet-draw by The Brofessor
-    map.addControl(drawControl);
-    map.on(L.Draw.Event.CREATED, function (e) {
-        var layer = e.layer;
-        var name = getName(layer);
-
-        // seeArea varible holds the value of the area generated by the user's polygon || the L.Geometry util method does the calculation and it is linked to the GeometryUtil.js file in the js folder of the project.
-        var seeArea = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]);
-        //If statement that does not name the polygon unless the user inputs some data
-        if (name == 'geometry name') {
-            layer.bindPopup('-- no name provided --');
-        } else if (name == '') {
-            layer.bindPopup('-- no name provided --');
-        } else {
-            //Adds hectare acre to console log
-            console.log(seeArea);
-            layer.bindTooltip("Name of polygon: " + name + ", Area of polygon = " + ((seeArea / 10000).toFixed(2)) + " ha", { permanent: true, direction: 'top' })
-        };
-
-
-
-        //Displays the name and hectare acreage to the polygon 
-        drawnItems.addLayer(layer);
 
 
 
 
 
-    });
+
+
+
+
+
+
 
 
 

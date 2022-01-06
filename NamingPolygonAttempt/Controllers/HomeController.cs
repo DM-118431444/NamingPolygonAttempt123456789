@@ -7,6 +7,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
+
+using Dapper;
+using Dapper.Contrib.Extensions;
+using NamingPolygonAttempt.ViewModels;
+using NamingPolygonAttempt.Helpers;
+
 namespace NamingPolygonAttempt.Controllers
 {
     public class HomeController : Controller
@@ -20,7 +26,52 @@ namespace NamingPolygonAttempt.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            TodoListViewModel viewModel = new TodoListViewModel();
+            return View("Index", viewModel);
+        }
+
+        public IActionResult Edit(int id)
+        {
+            TodoListViewModel viewModel = new TodoListViewModel();
+            viewModel.EditableItem = viewModel.TodoItems.FirstOrDefault(x => x.Id == id);
+            return View("Index", viewModel);
+        }
+
+        public IActionResult Delete(int id)
+        {
+            using (var db = DBHelper.GetConnection())
+            {
+                TodoListItem item = db.Get<TodoListItem>(id);
+                if (item != null)
+                    db.Delete(item);
+                return RedirectToAction("Index");
+            }
+        }
+
+        public IActionResult CreateUpdate(TodoListViewModel viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                using (var db = DBHelper.GetConnection())
+                {
+                    if (viewModel.EditableItem.Id <= 0)
+                    {
+                        db.Insert<TodoListItem>(viewModel.EditableItem);
+                    }
+                    else
+                    {
+                        TodoListItem dbItem = db.Get<TodoListItem>(viewModel.EditableItem.Id);
+                        TryUpdateModelAsync<TodoListItem>(dbItem,"EditableItem");
+                        db.Update<TodoListItem>(dbItem);
+                    }
+                }
+
+            }
+            else
+                return RedirectToAction("Index");
+
+
+            return View("Index", new TodoListViewModel());
         }
 
         public IActionResult Privacy()
