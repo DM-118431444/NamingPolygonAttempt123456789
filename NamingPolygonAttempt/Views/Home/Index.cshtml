@@ -1,6 +1,9 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+
+
+
 @model NamingPolygonAttempt.ViewModels.TodoListViewModel
 <!-- All code that is not my own or auto-code, unless stated otherwise, is taken from  https://stackoverflow.com/questions/67153941/is-there-a-way-to-open-a-popup-input-text-after-a-polygon-is-created-in-leaflet by giskan77-->
 
@@ -14,8 +17,9 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw-src.css" integrity="sha512-vJfMKRRm4c4UupyPwGUZI8U651mSzbmmPgR3sdE3LcwBPsdGeARvUM5EcSTg34DK8YIRiIo+oJwNfZPMKEQyug==" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" integrity="sha512-ozq8xQKq6urvuU6jNgkfqAmT7jKN2XumbrX1JiB3TnF7tI48DPI4Gy1GXKD/V3EExgAs1V+pRO7vwtS1LHg0Gw==" crossorigin="anonymous"></script>
+    <script>src = "..\js\site.js"</script>
 
- 
+
 
 
     <script>src = "..\js\GeometryUtil.js"</script>
@@ -47,48 +51,18 @@
             Esri_WorldImagery.addTo(map);
 
 
-            var state = {
-            "type": "FeatureCollection",
-                "features": [
-                    {
-                        "type": "Feature",
-                        "properties": {},
-                        "geometry": {
-                            "type": "Polygon",
-                            "coordinates": [
-                                [
-                                    [
-                                        46.7578125,
-                                        59.355596110016315
-                                    ],
-                                    [
-                                        45,
-                                        53.330872983017066
-                                    ],
-                                    [
-                                        60.1171875,
-                                        52.482780222078226
-                                    ],
-                                    [
-                                        62.9296875,
-                                        60.23981116999893
-                                    ],
-                                    [
-                                        46.7578125,
-                                        59.355596110016315
-                                    ]
-                                ]
-                            ]
-                        }
-                    }
-                ]
-        } 
+            //var states = { "type": "Feature", "geometry": { "type": "Point", "coordinates": [-104.99404, 39.75621] } }
 
-
+            //L.geoJSON((states)).addTo(map);
 
             drawnItems = L.featureGroup().addTo(map);
 
 
+            //var polygon = turf.polygon([[[125, -15], [113, -22], [154, -27], [144, -15], [125, -15]]]);
+
+            //var area = turf.area(polygon);
+
+            //L.geoJSON(polygon).addTo(map);
 
 
 
@@ -147,21 +121,33 @@
             var btn = document.createElement("button");
             btn.innerHTML = "Click me";
 
+            var states1 = { "type": "Feature", "geometry": { "type": "Point", "coordinates": [-104.99404, 39.75621] } };
+
                 var id = (@item.Id);
             var farmerid = @item.FarmerID;
-            var geojson2 = '@item.GeoJson';
+            var geojson2 = "@item.GeoJson";
+            
 
-            //var geojson3 = JSON.stringify(geojson2);
 
-            var obj = JSON.parse(document.getElementById('mytextarea').innerHTML = geojson2);
+
+            var geojson3 = JSON.stringify(geojson2);
+            console.log(geojson2)
+
+            
+
+            var obj = (document.getElementById('mytextarea').innerHTML = (states2));
             console.log(obj['type']);
 
 
-            @*// var geojson1 = JSON.parse(''@item.GeoJson'');*@
+
+            L.geoJSON(states2).addTo.map()
+
+
+            @*var geojson1 = JSON.parse(@item.GeoJson);*@
 
 
 
-          //L.geoJSON(geojson3).addTo(map);
+            L.geoJSON(geojson2).addTo(map);
                  /* Where I found out how to put button in popup, tutorial was for a hyperlink  http://jsfiddle.net/8Lnt4/ and
                 * https://stackoverflow.com/questions/13698975/click-link-inside-leaflet-popup-and-do-javascript */
             //L.geoJSON(geojson1).bindPopup(geojson1).addTo(map);
@@ -170,13 +156,12 @@
 
 
 
+
                 </text>
 
                 }
 
             };
-
-
 
 
 
@@ -199,7 +184,7 @@
 
     <input onclick="change()" type="button" value="Open Curtain" id="myButton1">
 
-    <textarea id="mytextarea">Text to be changed</textarea>
+    <textarea id="mytextarea" style="width: 300px; height:300px;">Text to be changed</textarea>
 
     <table class="table table-striped table-bordered table-hover" style="max-width: 500px;">
 
@@ -226,29 +211,33 @@
 
         @foreach (var item in Model.TodoItems)
         {
-            <tr>
+    <tr>
 
-                <td>
+        <td>
 
-                    <input type="checkbox" checked="@item.IsDone" onclick="window.location.href = '/Home/ToggleIsDone/@item.Id';" />
+            <input type="checkbox" checked="@item.IsDone" onclick="window.location.href = '/Home/ToggleIsDone/@item.Id';" />
 
-                    <a href="/Home/Edit/@item.Id">
-                        @item.Id
-
-                    </a>
-
-                </td>
+            <a href="/Home/Edit/@item.Id">
+                @item.Id
 
 
+            </a>
 
-                <td class="text-center"><a href="/Home/Delete/@item.Id" onclick="return confirm('Are you sure?');" class="btn btn-sm btn-danger">Delete</a></td>
-
-                <td>@item.FarmerID</td>
-                <td>@item.GeoJson</td>
+        </td>
 
 
 
-            </tr>
+        <td class="text-center"><a href="/Home/Delete/@item.Id" onclick="return confirm('Are you sure?');" class="btn btn-sm btn-danger">Delete</a></td>
+
+        <td>@item.FarmerID</td>
+        <td>@item.GeoJson</td>
+        
+        
+
+
+
+
+    </tr>
 
 
 
@@ -256,11 +245,12 @@
 
     </table>
 
-
+    
 
 
 </body>
 <script>
+
 
 
 

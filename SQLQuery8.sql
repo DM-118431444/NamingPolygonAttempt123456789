@@ -1,0 +1,1 @@
+﻿SELECT dbo.geometry2json(GeomCol1) as Geometry From TodoListItems

@@ -18,10 +18,17 @@ namespace NamingPolygonAttempt.ViewModels
             using (var db = DBHelper.GetConnection())
             {
                 this.EditableItem = new TodoListItem();
-                this.TodoItems = db.Query<TodoListItem>("SELECT * FROM TodoListItems").ToList();
+                this.TodoItems = db.Query<TodoListItem>("SELECT dbo.geometry2json(GeomCol1) as Geometry From SpatialTable").ToList();
+
+
             }
         }
+
+
         public List<TodoListItem> TodoItems { get; set; }
         public TodoListItem EditableItem { get; set; }
+
+     
     }
 }
+

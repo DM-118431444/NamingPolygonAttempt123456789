@@ -1,0 +1,91 @@
+﻿<!-- All code that is not my own or auto-code, unless stated otherwise, is taken from  https://stackoverflow.com/questions/67153941/is-there-a-way-to-open-a-popup-input-text-after-a-polygon-is-created-in-leaflet by giskan77-->
+
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw-src.css" integrity="sha512-vJfMKRRm4c4UupyPwGUZI8U651mSzbmmPgR3sdE3LcwBPsdGeARvUM5EcSTg34DK8YIRiIo+oJwNfZPMKEQyug==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" integrity="sha512-ozq8xQKq6urvuU6jNgkfqAmT7jKN2XumbrX1JiB3TnF7tI48DPI4Gy1GXKD/V3EExgAs1V+pRO7vwtS1LHg0Gw==" crossorigin="anonymous"></script>
+
+
+
+
+    <script>src = "..\js\GeometryUtil.js"</script>
+
+</head>
+<div class="text-center">
+    <h1 class="display-4">Polygon naming example</h1>
+
+</div>
+
+<div id="map" style="width: 100%; height: 500px;"></div>
+
+<script>
+    //Creating the map, centering it and adding the zoom
+    var map = L.map('map', {
+        center: [51.8935, -8.4921],
+        zoom: 16,
+    });
+
+    //OpenStreetMap Layer at https://leafletjs.com/index.html
+    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    osm.addTo(map);
+
+    //Esri.World Imagery js found at https://leaflet-extras.github.io/leaflet-providers/preview/ || They are open source tilelayers
+
+    var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    });
+
+    Esri_WorldImagery.addTo(map);
+
+    var states = [{
+        "type": "Feature",
+        "properties": { "party": "Republican" },
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [[
+                [-104.05, 48.99],
+                [-97.22, 48.98],
+                [-96.58, 45.94],
+                [-104.03, 45.94],
+                [-104.05, 48.99]
+            ]]
+        }
+    }, {
+        "type": "Feature",
+        "properties": { "party": "Democrat" },
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [[
+                [-109.05, 41.00],
+                [-102.06, 40.99],
+                [-102.03, 36.99],
+                [-109.04, 36.99],
+                [-109.05, 41.00]
+            ]]
+        }
+    }];
+
+    L.geoJSON(states, {
+        style: function (feature) {
+            switch (feature.properties.party) {
+                case 'Republican': return { color: "#ff0000" };
+                case 'Democrat': return { color: "#0000ff" };
+            }
+        }
+        
+    }).addTo(map);
+
+    console.log(states);
+
+
+
+   
+
+
+
+</script>

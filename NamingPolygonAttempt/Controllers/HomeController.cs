@@ -12,6 +12,10 @@ using Dapper;
 using Dapper.Contrib.Extensions;
 using NamingPolygonAttempt.ViewModels;
 using NamingPolygonAttempt.Helpers;
+using System.Data;
+using System.Data.SqlClient;
+using Microsoft.IdentityModel.Protocols;
+using System.Configuration;
 
 namespace NamingPolygonAttempt.Controllers
 {
@@ -76,8 +80,21 @@ namespace NamingPolygonAttempt.Controllers
 
         public IActionResult Privacy()
         {
-            return View();
+
+                return View();
         }
+
+        //public IActionResult New()
+        //{
+        //    using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["myDbConnection"].ConnectionString))
+        //    {
+        //        string insertQuery = @"INSERT INTO [dbo].[Customer]([FirstName], [LastName], [State], [City], [IsActive], [CreatedOn]) VALUES (@FirstName, @LastName, @State, @City, @IsActive, @CreatedOn)";
+
+        //        var result = db.Execute(insertQuery, customerViewModel);
+
+        //    }
+        //    return View();
+        //}
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
